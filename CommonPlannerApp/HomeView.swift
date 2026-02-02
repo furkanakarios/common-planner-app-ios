@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var showSessionEntry = false
+    @State private var activeSessionCode: SessionCode?
 
     var body: some View {
         NavigationStack {
@@ -54,9 +55,12 @@ struct HomeView: View {
             .background(Color(.systemBackground))
             .navigationBarHidden(true)
             .sheet(isPresented: $showSessionEntry) {
-                SessionEntrySheet()
+                SessionEntrySheet(startSessionCode: $activeSessionCode)
                     .presentationDetents([.height(260)])
                     .presentationDragIndicator(.visible)
+            }
+            .fullScreenCover(item: $activeSessionCode) { code in
+                WeddingSessionRootView(sessionCode: code.id)
             }
         }
     }
