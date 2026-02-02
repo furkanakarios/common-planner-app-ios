@@ -11,7 +11,8 @@ struct JoinSessionView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var code: String = ""
     @State private var showError = false
-
+    @Binding var startSessionCode: SessionCode?
+    
     var body: some View {
         VStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 8) {
@@ -49,8 +50,7 @@ struct JoinSessionView: View {
                     showError = true
                     return
                 }
-
-                // Sonraki adım: “koda göre oturum bul / bağlan” eklenecek
+                startSessionCode = SessionCode(id: code)
                 dismiss()
             } label: {
                 Text("Katıl")

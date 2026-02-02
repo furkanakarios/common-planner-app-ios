@@ -11,7 +11,8 @@ import UniformTypeIdentifiers
 struct CreateSessionView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var sessionCode: String = SessionCodeGenerator.generate()
-
+    @Binding var startSessionCode: SessionCode?
+    
     var body: some View {
         VStack(spacing: 18) {
             VStack(spacing: 8) {
@@ -45,7 +46,7 @@ struct CreateSessionView: View {
             .buttonStyle(.bordered)
 
             Button {
-                // Sonraki adım: PlannerSessionRootView’a geçeceğiz
+                startSessionCode = SessionCode(id: sessionCode)
                 dismiss()
             } label: {
                 Text("Devam Et")

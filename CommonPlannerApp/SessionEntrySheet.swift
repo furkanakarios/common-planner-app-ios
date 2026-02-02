@@ -9,7 +9,8 @@ import SwiftUI
 
 struct SessionEntrySheet: View {
     @Environment(\.dismiss) private var dismiss
-
+    @Binding var startSessionCode: SessionCode?
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 14) {
@@ -30,7 +31,7 @@ struct SessionEntrySheet: View {
                 Spacer().frame(height: 6)
 
                 NavigationLink {
-                    CreateSessionView()
+                    CreateSessionView(startSessionCode: $startSessionCode)
                 } label: {
                     Text("Yeni Oturum Başlat")
                         .frame(maxWidth: .infinity)
@@ -39,7 +40,7 @@ struct SessionEntrySheet: View {
                 .buttonStyle(.borderedProminent)
 
                 NavigationLink {
-                    JoinSessionView()
+                    JoinSessionView(startSessionCode: $startSessionCode)
                 } label: {
                     Text("Oturuma Katıl")
                         .frame(maxWidth: .infinity)
