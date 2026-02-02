@@ -54,18 +54,9 @@ struct HomeView: View {
             .background(Color(.systemBackground))
             .navigationBarHidden(true)
             .sheet(isPresented: $showSessionEntry) {
-                SessionEntrySheet(
-                    onCreate: {
-                        // Sonraki adımda CreateSessionView’a yönlendireceğiz
-                        showSessionEntry = false
-                    },
-                    onJoin: {
-                        // Sonraki adımda JoinSessionView’a yönlendireceğiz
-                        showSessionEntry = false
-                    }
-                )
-                .presentationDetents([.height(260)])
-                .presentationDragIndicator(.visible)
+                SessionEntrySheet()
+                    .presentationDetents([.height(260)])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
