@@ -10,42 +10,57 @@ import SwiftUI
 struct WeddingExpensesView: View {
     @EnvironmentObject private var store: WeddingSessionStore
 
-    var selected: [WeddingEntry] {
+    private var selected: [WeddingEntry] {
         store.entries.filter { $0.status == .selected }
     }
 
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    HStack {
-                        Text("Toplam Seçilen")
-                        Spacer()
-                        Text(formatCurrency(store.totalSelectedAmount()))
-                            .fontWeight(.semibold)
-                    }
-                }
+            ZStack {
+                ThemeBackground()
 
-                Section("Seçilenler") {
-                    if selected.isEmpty {
-                        Text("Henüz seçilen bir kayıt yok.")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        ForEach(selected) { e in
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(e.title).font(.headline)
-                                Text(store.categoryName(for: e.categoryId))
-                                    .font(.footnote)
-                                    .foregroundStyle(.secondary)
-                                Text(formatCurrency(e.price))
-                                    .font(.subheadline.weight(.semibold))
+                VStack {
+                    List {
+                        Section {
+                            HStack {
+                                Text("Toplam Seçilen")
+                                Spacer()
+                                Text(formatCurrency(store.totalSelectedAmount()))
+                                    .fontWeight(.semibold)
                             }
-                            .padding(.vertical, 4)
+                        }
+
+                        Section("Seçilenler") {
+                            if selected.isEmpty {
+                                Text("Henüz seçilen bir kayıt yok.")
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(selected) { e in
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text(e.title).font(.headline)
+                                        Text(store.categoryName(for: e.categoryId))
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                        Text(formatCurrency(e.price))
+                                            .font(.subheadline.weight(.semibold))
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                            }
                         }
                     }
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
                 }
+                .padding(20)
+                .background(.ultraThinMaterial.opacity(0.85))
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
             }
             .navigationTitle("Harcamalar")
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .background(Color.clear)
         }
     }
 

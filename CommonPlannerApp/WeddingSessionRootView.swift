@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct WeddingSessionRootView: View {
-    @Environment(\.dismiss) private var dismiss
     @StateObject private var store: WeddingSessionStore
 
     init(sessionCode: String) {
@@ -16,16 +15,22 @@ struct WeddingSessionRootView: View {
     }
 
     var body: some View {
-        TabView {
-            WeddingOptionsView()
-                .tabItem { Label("Seçenekler", systemImage: "square.grid.2x2") }
+        ZStack {
+            ThemeBackground()
 
-            WeddingExpensesView()
-                .tabItem { Label("Harcamalar", systemImage: "creditcard") }
+            TabView {
+                WeddingOptionsView()
+                    .tabItem { Label("Seçenekler", systemImage: "square.grid.2x2") }
 
-            WeddingSummaryView()
-                .tabItem { Label("Özet", systemImage: "chart.bar") }
+                WeddingExpensesView()
+                    .tabItem { Label("Harcamalar", systemImage: "creditcard") }
+
+                WeddingSummaryView()
+                    .tabItem { Label("Özet", systemImage: "chart.bar") }
+            }
+            .environmentObject(store)
         }
-        .environmentObject(store)
+        .background(Color.clear)
+        .toolbarBackground(.hidden, for: .tabBar)
     }
 }
