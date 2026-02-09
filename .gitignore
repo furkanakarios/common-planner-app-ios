@@ -69,3 +69,7 @@ fastlane/test_output
 xcuserdata/
 *.xcuserstate
 
+
+# Xcode user-specific files
+**/xcuserdata/
+**/*.xcuserstate
