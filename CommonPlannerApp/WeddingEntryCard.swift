@@ -4,10 +4,17 @@
 //
 //  Created by Furkan Akar on 2.02.2026.
 //
+//
+//  WeddingEntryCard.swift
+//  CommonPlannerApp
+//
+//  Created by Furkan Akar on 2.02.2026.
+//
 
 import SwiftUI
 
 struct WeddingEntryCard: View {
+    @State private var showEdit = false
     @EnvironmentObject private var store: WeddingSessionStore
     let entry: WeddingEntry
 
@@ -20,46 +27,64 @@ struct WeddingEntryCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
+        VStack(alignment: .leading, spacing: 4) {
+
+            // Üst satır: Kategori (sol) + Durum Menüsü (sağ) + Edit ikonu (durumun altında)
+            HStack(alignment: .top) {
                 Text(store.categoryName(for: entry.categoryId))
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)
 
                 Spacer()
 
-                Menu {
-                    Button {
-                        store.updateStatus(entryId: entry.id, status: .candidate)
+                VStack(alignment: .trailing, spacing: 6) {
+                    Menu {
+                        Button {
+                            store.updateStatus(entryId: entry.id, status: .candidate)
+                        } label: {
+                            Label("Aday", systemImage: "circle")
+                        }
+
+                        Button {
+                            store.updateStatus(entryId: entry.id, status: .selected)
+                        } label: {
+                            Label("Seçilen", systemImage: "checkmark.circle.fill")
+                        }
+
+                        Button {
+                            store.updateStatus(entryId: entry.id, status: .eliminated)
+                        } label: {
+                            Label("Elenen", systemImage: "xmark.circle.fill")
+                        }
                     } label: {
-                        Label("Aday", systemImage: "circle")
+                        Text(statusText)
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule().fill(statusPillColor)
+                            )
                     }
 
-                    Button {
-                        store.updateStatus(entryId: entry.id, status: .selected)
-                    } label: {
-                        Label("Seçilen", systemImage: "checkmark.circle.fill")
-                    }
-
-                    Button {
-                        store.updateStatus(entryId: entry.id, status: .eliminated)
-                    } label: {
-                        Label("Elenen", systemImage: "xmark.circle.fill")
-                    }
-                } label: {
-                    Text(statusText)
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule().fill(statusPillColor)
-                        )
                 }
-
             }
 
-            Text(entry.title)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+            // Başlık satırı (artık solda edit ikonu yok)
+            HStack(alignment: .center, spacing: 8) {
+                Text(entry.title)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+
+                Spacer(minLength: 0)
+
+                Button {
+                    showEdit = true
+                } label: {
+                    Image(systemName: "square.and.pencil")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
 
             Text(formatCurrency(entry.price))
                 .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -104,6 +129,10 @@ struct WeddingEntryCard: View {
             }
             .tint(.gray)
         }
+        .sheet(isPresented: $showEdit) {
+            EditWeddingEntrySheet(entry: entry)
+                .environmentObject(store)
+        }
     }
 
     private func formatCurrency(_ value: Decimal) -> String {
@@ -113,7 +142,7 @@ struct WeddingEntryCard: View {
         formatter.locale = Locale(identifier: "tr_TR")
         return formatter.string(from: number) ?? "\(number)"
     }
-    
+
     private var statusPillColor: Color {
         switch entry.status {
         case .candidate: return Color(.tertiarySystemFill)
@@ -121,5 +150,4 @@ struct WeddingEntryCard: View {
         case .eliminated: return Color.red.opacity(0.16)
         }
     }
-
 }

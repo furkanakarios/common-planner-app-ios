@@ -70,4 +70,12 @@ final class WeddingSessionStore: ObservableObject {
             .filter { $0.status == .selected }
             .reduce(0) { $0 + $1.price }
     }
+    
+    
+    func updateEntry(_ updated: WeddingEntry) {
+        guard let idx = entries.firstIndex(where: { $0.id == updated.id }) else { return }
+        entries[idx] = updated
+    }
+    
+    
 }
