@@ -25,8 +25,11 @@ struct CommonPlannerAppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            SplashView()
+            ZStack {
+                ThemeBackground()
+                SplashView()
+            }
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(for: Item.self)
     }
 }

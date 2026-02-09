@@ -4,7 +4,6 @@
 //
 //  Created by Furkan Akar on 2.02.2026.
 //
-
 import SwiftUI
 
 struct WeddingSummaryView: View {
@@ -12,18 +11,30 @@ struct WeddingSummaryView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 14) {
-                summaryCard
-                Spacer()
-                Text("PDF dışa aktarma ve detay raporlar bir sonraki adımda eklenecek.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 18)
-                Spacer()
+            ZStack {
+                ThemeBackground()
+
+                VStack(spacing: 14) {
+                    summaryCard
+                    Spacer()
+
+                    Text("PDF dışa aktarma ve detay raporlar bir sonraki adımda eklenecek.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 18)
+
+                    Spacer()
+                }
+                .padding(20)
+                .background(.ultraThinMaterial.opacity(0.85))
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
             }
-            .padding(16)
             .navigationTitle("Özet")
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .background(Color.clear)
         }
     }
 

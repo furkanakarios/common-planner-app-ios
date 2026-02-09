@@ -6,22 +6,17 @@
 //
 
 import SwiftUI
-
-enum OptionsFilter: String, CaseIterable {
-    case all = "Tümü"
-    case candidate = "Aday"
-    case selected = "Seçilen"
-    case eliminated = "Elenen"
-}
+import UIKit
 
 struct WeddingOptionsView: View {
     @EnvironmentObject private var store: WeddingSessionStore
+
     @State private var filter: OptionsFilter = .all
     @State private var showAddEntry = false
     @State private var showManageCategories = false
     @State private var selectedCategoryId: UUID? = nil
 
-    var filteredEntries: [WeddingEntry] {
+    private var filteredEntries: [WeddingEntry] {
         let byStatus: [WeddingEntry] = {
             switch filter {
             case .all: return store.entries
@@ -34,34 +29,47 @@ struct WeddingOptionsView: View {
         guard let selectedCategoryId else { return byStatus }
         return byStatus.filter { $0.categoryId == selectedCategoryId }
     }
+
     var body: some View {
         NavigationStack {
-            VStack(spacing: 12) {
-                sessionHeader
+            ZStack {
+                ThemeBackground()
 
-                Picker("", selection: $filter) {
-                    ForEach(OptionsFilter.allCases, id: \.self) { f in
-                        Text(f.rawValue).tag(f)
-                    }
-                }
-                .pickerStyle(.segmented)
-                categoryFilterChips
+                VStack(spacing: 12) {
+                    sessionHeader
 
-                ScrollView {
-                    LazyVStack(spacing: 12) {
-                        ForEach(filteredEntries) { entry in
-                            WeddingEntryCard(entry: entry)
-                        }
-                        if filteredEntries.isEmpty {
-                            emptyState
-                                .padding(.top, 30)
+                    Picker("", selection: $filter) {
+                        ForEach(OptionsFilter.allCases, id: \.self) { f in
+                            Text(f.rawValue).tag(f)
                         }
                     }
-                    .padding(.vertical, 8)
+                    .pickerStyle(.segmented)
+
+                    categoryFilterChips
+
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(filteredEntries) { entry in
+                                WeddingEntryCard(entry: entry)
+                            }
+
+                            if filteredEntries.isEmpty {
+                                emptyState
+                                    .padding(.top, 30)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    }
                 }
+                .padding(20)
+                .background(.ultraThinMaterial.opacity(0.85))
+                .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
             }
-            .padding(.horizontal, 16)
             .navigationBarHidden(true)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .background(Color.clear)
             .safeAreaInset(edge: .bottom) {
                 Button {
                     showAddEntry = true
@@ -77,7 +85,7 @@ struct WeddingOptionsView: View {
                 .buttonStyle(.borderedProminent)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 10)
-                .background(.ultraThinMaterial)
+                .background(.ultraThinMaterial.opacity(0.85))
             }
             .sheet(isPresented: $showAddEntry) {
                 AddWeddingEntrySheet(preselectedCategoryId: selectedCategoryId)
@@ -87,6 +95,8 @@ struct WeddingOptionsView: View {
             }
         }
     }
+
+    // MARK: - UI Components
 
     private var sessionHeader: some View {
         HStack(spacing: 10) {
@@ -111,12 +121,8 @@ struct WeddingOptionsView: View {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .background(
-                    Capsule().fill(Color(.secondarySystemBackground))
-                )
-                .overlay(
-                    Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1)
-                )
+                .background(Capsule().fill(Color(.secondarySystemBackground)))
+                .overlay(Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1))
             }
             .buttonStyle(.plain)
 
@@ -145,8 +151,10 @@ struct WeddingOptionsView: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 28, weight: .semibold))
                 .foregroundStyle(.secondary)
+
             Text("Henüz bir seçenek yok")
                 .font(.system(size: 16, weight: .semibold, design: .rounded))
+
             Text("Mekan, eşya veya masraf seçeneklerini ekleyerek başlayın.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -154,7 +162,7 @@ struct WeddingOptionsView: View {
                 .padding(.horizontal, 12)
         }
     }
-    
+
     private var categoryFilterChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
@@ -166,11 +174,11 @@ struct WeddingOptionsView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(
-                            Capsule().fill(selectedCategoryId == nil ? Color(.tertiarySystemFill) : Color(.secondarySystemBackground))
+                            Capsule().fill(selectedCategoryId == nil
+                                           ? Color(.tertiarySystemFill)
+                                           : Color(.secondarySystemBackground))
                         )
-                        .overlay(
-                            Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1)
-                        )
+                        .overlay(Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1))
                 }
                 .buttonStyle(.plain)
 
@@ -183,11 +191,11 @@ struct WeddingOptionsView: View {
                             .padding(.horizontal, 12)
                             .padding(.vertical, 8)
                             .background(
-                                Capsule().fill(selectedCategoryId == cat.id ? Color(.tertiarySystemFill) : Color(.secondarySystemBackground))
+                                Capsule().fill(selectedCategoryId == cat.id
+                                               ? Color(.tertiarySystemFill)
+                                               : Color(.secondarySystemBackground))
                             )
-                            .overlay(
-                                Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1)
-                            )
+                            .overlay(Capsule().strokeBorder(Color.black.opacity(0.06), lineWidth: 1))
                     }
                     .buttonStyle(.plain)
                 }
@@ -195,5 +203,4 @@ struct WeddingOptionsView: View {
             .padding(.vertical, 2)
         }
     }
-
 }

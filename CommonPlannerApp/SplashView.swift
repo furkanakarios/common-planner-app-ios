@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import AVKit
 
 struct SplashView: View {
-    @State private var player: AVPlayer?
     @State private var isActive = false
+    @State private var isTransitioning = false
 
     var body: some View {
         Group {
@@ -20,40 +19,28 @@ struct SplashView: View {
                 ZStack {
                     Color.white.ignoresSafeArea()
 
-                    if let player {
-                        SplashVideoView(player: player)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .ignoresSafeArea()
+                    if let url = Bundle.main.url(forResource: "splash", withExtension: "mp4") {
+                        SplashVideoView(
+                            url: url,
+                            isTransitioning: isTransitioning,
+                            onVideoFinished: handleVideoFinished
+                        )
+                    } else {
+                        // Video bulunamazsa direkt Home'a geç
+                        HomeView()
                     }
                 }
             }
         }
-        .onAppear {
-            playVideo()
-        }
     }
 
-    private func playVideo() {
-        guard let url = Bundle.main.url(forResource: "splash", withExtension: "mp4") else {
-            // Video bulunamazsa direkt Home'a geç
+    private func handleVideoFinished() {
+        // 1) Zoom + fade animasyonunu başlat
+        isTransitioning = true
+
+        // 2) Animasyon bitince Home'a geç
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) {
             isActive = true
-            return
         }
-
-        let player = AVPlayer(url: url)
-        self.player = player
-
-        // Video bittiğinde Home'a geç
-        NotificationCenter.default.addObserver(
-            forName: .AVPlayerItemDidPlayToEndTime,
-            object: player.currentItem,
-            queue: .main
-        ) { _ in
-            withAnimation(.easeOut(duration: 0.3)) {
-                isActive = true
-            }
-        }
-
-        player.play()
     }
 }
