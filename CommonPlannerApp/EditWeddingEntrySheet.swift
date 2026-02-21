@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct EditWeddingEntrySheet: View {
     let entry: WeddingEntry
@@ -18,6 +19,8 @@ struct EditWeddingEntrySheet: View {
     @State private var priceText: String
     @State private var note: String
     @State private var link: String
+    @State private var selectedItems: [PhotosPickerItem] = []
+    @State private var selectedImagesData: [Data] = []
 
     @State private var showValidation = false
 
@@ -28,6 +31,7 @@ struct EditWeddingEntrySheet: View {
         _priceText = State(initialValue: "\(entry.price)")
         _note = State(initialValue: entry.note ?? "")
         _link = State(initialValue: entry.link ?? "")
+        _selectedImagesData = State(initialValue: entry.photos)
     }
 
     var isValid: Bool {
@@ -65,6 +69,52 @@ struct EditWeddingEntrySheet: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 }
+                
+                Section("Fotoğraflar (en fazla 5)") {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(Array(selectedImagesData.enumerated()), id: \.offset) { index, data in
+                                if let uiImage = UIImage(data: data) {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 72, height: 72)
+                                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                        .overlay(alignment: .topTrailing) {
+                                            Button {
+                                                selectedImagesData.remove(at: index)
+                                                if selectedItems.indices.contains(index) { selectedItems.remove(at: index) }
+                                            } label: {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .font(.system(size: 14, weight: .bold))
+                                                    .symbolRenderingMode(.palette)
+                                                    .foregroundStyle(.white, .black.opacity(0.6))
+                                                    .background(Circle().fill(Color.black.opacity(0.001)))
+                                            }
+                                            .offset(x: 4, y: -4)
+                                        }
+                                }
+                            }
+
+                            if selectedImagesData.count < 5 {
+                                PhotosPicker(selection: $selectedItems, maxSelectionCount: 5 - selectedImagesData.count, matching: .images) {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "plus")
+                                            .font(.system(size: 18, weight: .semibold))
+                                        Text("Ekle")
+                                            .font(.footnote.weight(.semibold))
+                                    }
+                                    .frame(width: 72, height: 72)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                            .fill(Color(.tertiarySystemFill))
+                                    )
+                                }
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
 
                 if showValidation && !isValid {
                     Section {
@@ -95,12 +145,22 @@ struct EditWeddingEntrySheet: View {
                             price: price,
                             note: note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note,
                             link: link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : link,
+                            photos: selectedImagesData,
                             status: entry.status,
                             createdAt: entry.createdAt
                         )
 
                         store.updateEntry(updated)
                         dismiss()
+                    }
+                }
+            }
+            .onChange(of: selectedItems) { oldValue, newValue in
+                Task {
+                    for item in newValue.suffix(5 - selectedImagesData.count) {
+                        if let data = try? await item.loadTransferable(type: Data.self) {
+                            if selectedImagesData.count < 5 { selectedImagesData.append(data) }
+                        }
                     }
                 }
             }

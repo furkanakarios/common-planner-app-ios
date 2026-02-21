@@ -17,6 +17,9 @@ struct WeddingEntryCard: View {
     @State private var showEdit = false
     @EnvironmentObject private var store: WeddingSessionStore
     let entry: WeddingEntry
+    @State private var showImageViewer = false
+    @State private var previewImages: [UIImage] = []
+    @State private var selectedPreviewIndex: Int = 0
 
     var statusText: String {
         switch entry.status {
@@ -89,6 +92,30 @@ struct WeddingEntryCard: View {
             Text(formatCurrency(entry.price))
                 .font(.system(size: 16, weight: .bold, design: .rounded))
 
+            if !entry.photos.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Array(entry.photos.enumerated()), id: \.offset) { idx, data in
+                            if let uiImage = UIImage(data: data) {
+                                Button {
+                                    selectedPreviewIndex = idx
+                                    previewImages = entry.photos.compactMap { UIImage(data: $0) }
+                                    showImageViewer = true
+                                } label: {
+                                    Image(uiImage: uiImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 56, height: 56)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                }
+            }
+
             if let note = entry.note, !note.isEmpty {
                 Text(note)
                     .font(.footnote)
@@ -133,6 +160,9 @@ struct WeddingEntryCard: View {
             EditWeddingEntrySheet(entry: entry)
                 .environmentObject(store)
         }
+        .fullScreenCover(isPresented: $showImageViewer) {
+            ImageViewer(images: previewImages, startIndex: selectedPreviewIndex)
+        }
     }
 
     private func formatCurrency(_ value: Decimal) -> String {
@@ -151,3 +181,46 @@ struct WeddingEntryCard: View {
         }
     }
 }
+private struct ImageViewer: View {
+    let images: [UIImage]
+    @State var index: Int
+    @Environment(\.dismiss) private var dismiss
+
+    init(images: [UIImage], startIndex: Int) {
+        self.images = images
+        self._index = State(initialValue: startIndex)
+    }
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            if !images.isEmpty {
+                TabView(selection: $index) {
+                    ForEach(Array(images.enumerated()), id: \.offset) { i, img in
+                        Image(uiImage: img)
+                            .resizable()
+                            .scaledToFit()
+                            .tag(i)
+                            .ignoresSafeArea()
+                    }
+                }
+                .tabViewStyle(.page(indexDisplayMode: .always))
+            }
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.9))
+                            .padding(12)
+                    }
+                }
+                Spacer()
+            }
+        }
+    }
+}
+
