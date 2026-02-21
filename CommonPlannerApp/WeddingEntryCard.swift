@@ -89,7 +89,7 @@ struct WeddingEntryCard: View {
                 .buttonStyle(.plain)
             }
 
-            Text(formatCurrency(entry.price))
+            Text("\(formatCurrency(entry.price)) (\(entry.paymentOption.rawValue))")
                 .font(.system(size: 16, weight: .bold, design: .rounded))
 
             if !entry.photos.isEmpty {

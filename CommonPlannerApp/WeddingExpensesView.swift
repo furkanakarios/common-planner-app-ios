@@ -41,7 +41,7 @@ struct WeddingExpensesView: View {
                                         Text(store.categoryName(for: e.categoryId))
                                             .font(.footnote)
                                             .foregroundStyle(.secondary)
-                                        Text(formatCurrency(e.price))
+                                        Text("\(formatCurrency(e.price)) (\(e.paymentOption.rawValue))")
                                             .font(.subheadline.weight(.semibold))
                                     }
                                     .padding(.vertical, 4)
