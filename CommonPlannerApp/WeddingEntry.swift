@@ -23,11 +23,28 @@ struct WeddingCategory: Identifiable, Hashable, Codable {
     }
 }
 
+enum PaymentOption: String, Codable, CaseIterable, Hashable {
+    case peşin = "Peşin"
+    case taksit1 = "1 Taksit"
+    case taksit2 = "2 Taksit"
+    case taksit3 = "3 Taksit"
+    case taksit4 = "4 Taksit"
+    case taksit5 = "5 Taksit"
+    case taksit6 = "6 Taksit"
+    case taksit7 = "7 Taksit"
+    case taksit8 = "8 Taksit"
+    case taksit9 = "9 Taksit"
+    case taksit10 = "10 Taksit"
+    case taksit11 = "11 Taksit"
+    case taksit12 = "12 Taksit"
+}
+
 struct WeddingEntry: Identifiable, Hashable, Codable {
     let id: UUID
     var title: String
     var categoryId: UUID
     var price: Decimal
+    var paymentOption: PaymentOption
     var note: String?
     var link: String?
     var photos: [Data] = []
@@ -39,6 +56,7 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
         title: String,
         categoryId: UUID,
         price: Decimal,
+        paymentOption: PaymentOption = .peşin,
         note: String? = nil,
         link: String? = nil,
         photos: [Data] = [],
@@ -49,6 +67,7 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
         self.title = title
         self.categoryId = categoryId
         self.price = price
+        self.paymentOption = paymentOption
         self.note = note
         self.link = link
         self.photos = photos
@@ -56,3 +75,4 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
         self.createdAt = createdAt
     }
 }
+

@@ -18,6 +18,7 @@ struct AddWeddingEntrySheet: View {
     @State private var title: String = ""
     @State private var selectedCategoryId: UUID?
     @State private var priceText: String = ""
+    @State private var paymentOption: PaymentOption = .peşin
     @State private var note: String = ""
     @State private var link: String = ""
     @State private var selectedItems: [PhotosPickerItem] = []
@@ -52,6 +53,12 @@ struct AddWeddingEntrySheet: View {
 
                     TextField("Fiyat (₺)", text: $priceText)
                         .keyboardType(.decimalPad)
+                    
+                    Picker("Ödeme Seçeneği", selection: $paymentOption) {
+                        ForEach(PaymentOption.allCases, id: \.self) { option in
+                            Text(option.rawValue).tag(option)
+                        }
+                    }
                 }
 
                 Section("Opsiyonel") {
@@ -146,6 +153,7 @@ struct AddWeddingEntrySheet: View {
                             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
                             categoryId: categoryId,
                             price: price,
+                            paymentOption: paymentOption,
                             note: note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : note,
                             link: link.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : link,
                             photos: selectedImagesData,
