@@ -30,6 +30,7 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
     var price: Decimal
     var note: String?
     var link: String?
+    var photos: [Data] = []
     var status: WeddingEntryStatus
     var createdAt: Date
 
@@ -40,6 +41,7 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
         price: Decimal,
         note: String? = nil,
         link: String? = nil,
+        photos: [Data] = [],
         status: WeddingEntryStatus = .candidate,
         createdAt: Date = Date()
     ) {
@@ -49,6 +51,7 @@ struct WeddingEntry: Identifiable, Hashable, Codable {
         self.price = price
         self.note = note
         self.link = link
+        self.photos = photos
         self.status = status
         self.createdAt = createdAt
     }
